@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session 1 — Classifying Quadrilaterals</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg:       #f4f0ff;
+  --surface:  #ffffff;
+  --surface2: #ede8ff;
+  --border:   #cdc0f0;
+  --ink:      #160a2e;
+  --muted:    #7a6ea0;
+  --purple:   #6d28d9;
+  --purple-light: #ede9fe;
+  --violet:   #8b5cf6;
+  --indigo:   #3730a3;
+  --indigo-light: #e0e7ff;
+  --pink:     #be185d;
+  --pink-light: #fce7f3;
+  --teal:     #0d7a72;
+  --teal-light: #ccfbf1;
+  --amber:    #b45309;
+  --amber-light: #fef3c7;
+  --green:    #166534;
+  --green-light: #dcfce7;
+  --red:      #b91c1c;
+  --red-light:#fee2e2;
+  --shadow:   0 4px 24px rgba(109,40,217,0.10);
+  --radius:   18px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  background-image: radial-gradient(ellipse at 8% 0%, #ddd6fe 0%, transparent 45%),
+                    radial-gradient(ellipse at 92% 100%, #e0e7ff 0%, transparent 45%);
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* HEADER */
+header {
+  background: linear-gradient(135deg, var(--indigo) 0%, var(--purple) 60%, var(--violet) 100%);
+  padding: 18px 30px;
+  display: flex; align-items: center; gap: 16px;
+  box-shadow: 0 4px 20px rgba(55,48,163,0.3);
+  position: sticky; top: 0; z-index: 100;
+}
+header h1 { font-family: 'Fraunces', serif; font-size: 1.55rem; color: #fff; line-height: 1.1; }
+header p  { font-size: .84rem; color: #c4b5fd; margin-top: 2px; font-weight: 500; }
+.h-badge  { margin-left: auto; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; font-size: .8rem; font-weight: 600; padding: 5px 16px; border-radius: 50px; white-space: nowrap; }
+
+/* TABS */
+.tabs { display: flex; gap: 3px; background: #fff; border-bottom: 2px solid var(--border); padding: 12px 30px 0; overflow-x: auto; }
+.tab-btn { font-family: 'Inter', sans-serif; font-size: .83rem; font-weight: 600; padding: 10px 18px; border: none; background: none; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; transition: all .18s; border-radius: 8px 8px 0 0; }
+.tab-btn:hover  { color: var(--purple); background: var(--purple-light); }
+.tab-btn.active { color: var(--purple); border-bottom-color: var(--purple); font-weight: 700; }
+
+/* MAIN */
+main { padding: 24px 30px; max-width: 1000px; }
+.section { display: none; animation: fadeUp .3s ease; }
+.section.active { display: block; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+/* CARD */
+.card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 18px; box-shadow: var(--shadow); }
+.card-title { font-family: 'Fraunces', serif; font-size: 1.15rem; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+
+/* BUTTONS */
+.btn { font-family: 'Inter', sans-serif; font-size: .85rem; font-weight: 600; padding: 9px 22px; border-radius: 50px; border: none; cursor: pointer; transition: all .18s; }
+.btn:hover  { transform: translateY(-1px) scale(1.03); filter: brightness(1.08); }
+.btn:active { transform: scale(.97); }
+.btn-purple { background: var(--purple); color: #fff; }
+.btn-indigo { background: var(--indigo); color: #fff; }
+.btn-teal   { background: var(--teal);   color: #fff; }
+.btn-pink   { background: var(--pink);   color: #fff; }
+.btn-ghost  { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
+.btn-ghost:hover { border-color: var(--purple); color: var(--purple); }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+/* FEEDBACK */
+.feedback { min-height: 24px; font-size: .88rem; font-weight: 600; padding: 4px 0; }
+.good { color: var(--green); }
+.bad  { color: var(--red); }
+
+/* TIP */
+.tip { display: flex; gap: 12px; align-items: flex-start; background: var(--purple-light); border-left: 4px solid var(--purple); border-radius: 0 10px 10px 0; padding: 11px 16px; margin: 12px 0; font-size: .88rem; line-height: 1.55; color: #4c1d95; }
+.tip strong { color: var(--purple); }
+.tip-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+/* SHAPE FLASH CARDS */
+.flash-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin: 14px 0; }
+.flash-card {
+  background: var(--surface2); border: 2px solid var(--border);
+  border-radius: 14px; padding: 14px 10px; text-align: center;
+  cursor: pointer; transition: all .2s; user-select: none;
+}
+.flash-card:hover { border-color: var(--purple); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(109,40,217,.15); }
+.flash-card.flipped { background: var(--purple-light); border-color: var(--purple); }
+.flash-card-front { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.flash-card-back  { display: none; font-family: 'Fraunces', serif; font-size: 1rem; color: var(--purple); }
+.flash-card.flipped .flash-card-front { display: none; }
+.flash-card.flipped .flash-card-back  { display: block; }
+
+/* QUIZ OPTS */
+.q-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.q-opt { font-family: 'Inter', sans-serif; font-size: .9rem; font-weight: 600; padding: 8px 22px; border-radius: 50px; background: #fff; border: 1.5px solid var(--border); cursor: pointer; transition: all .18s; color: var(--ink); }
+.q-opt:hover   { border-color: var(--purple); color: var(--purple); }
+.q-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); pointer-events: none; }
+.q-opt.wrong   { background: var(--red-light);   border-color: var(--red);   color: var(--red);   pointer-events: none; }
+.q-opt.showans { background: var(--green-light); border-color: var(--green); color: var(--green); }
+
+/* SHAPE DETECTIVE CARDS */
+.detective-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 18px; }
+.det-card {
+  background: var(--surface2); border: 2px solid var(--border);
+  border-radius: 16px; padding: 18px;
+  transition: all .2s; cursor: pointer;
+}
+.det-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(109,40,217,.14); }
+.det-card.expanded { border-color: var(--purple); background: var(--purple-light); }
+.det-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 0; }
+.det-card-name { font-family: 'Fraunces', serif; font-size: 1.05rem; color: var(--purple); }
+.det-card-body { margin-top: 14px; display: none; }
+.det-card.expanded .det-card-body { display: block; }
+.det-card-svg { display: flex; justify-content: center; margin-bottom: 12px; }
+.prop-list { list-style: none; }
+.prop-list li { font-size: .88rem; line-height: 1.6; padding: 3px 0; display: flex; align-items: flex-start; gap: 8px; }
+.prop-list li::before { content: '◆'; color: var(--violet); font-size: .6rem; margin-top: 5px; flex-shrink: 0; }
+.prop-tag { display: inline-block; font-size: .75rem; font-weight: 700; padding: 2px 10px; border-radius: 50px; margin: 2px 3px; }
+.tag-equal  { background: var(--amber-light);  color: var(--amber); border: 1px solid var(--amber); }
+.tag-para   { background: var(--indigo-light); color: var(--indigo); border: 1px solid var(--indigo); }
+.tag-right  { background: var(--teal-light);   color: var(--teal);  border: 1px solid var(--teal); }
+.tag-also   { background: var(--pink-light);   color: var(--pink);  border: 1px solid var(--pink); }
+.expand-hint { font-size: .78rem; color: var(--muted); margin-left: auto; }
+
+/* HIERARCHY DIAGRAM */
+.hier-wrap { overflow-x: auto; padding: 10px 0; }
+.hier-svg text { font-family: 'Inter', sans-serif; }
+
+/* SORT GAME */
+.sort-shapes { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.sort-chip {
+  background: var(--surface2); border: 2px solid var(--border);
+  border-radius: 50px; padding: 8px 18px; cursor: pointer;
+  font-size: .9rem; font-weight: 600; transition: all .2s;
+  display: flex; align-items: center; gap: 8px;
+}
+.sort-chip:hover { border-color: var(--purple); }
+.sort-chip.selected { background: var(--purple); color: #fff; border-color: var(--purple); }
+.sort-chip.correct-sel { background: var(--green-light); border-color: var(--green); color: var(--green); }
+.sort-chip.wrong-sel   { background: var(--red-light);   border-color: var(--red);   color: var(--red); }
+.sort-bins { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.sort-bin {
+  background: #fff; border: 2px dashed var(--border);
+  border-radius: 14px; padding: 12px; min-height: 80px;
+  text-align: center; cursor: pointer; transition: all .2s;
+}
+.sort-bin:hover { border-color: var(--purple); background: var(--purple-light); }
+.sort-bin.highlight { border-color: var(--purple); background: var(--purple-light); }
+.sort-bin-label { font-family: 'Fraunces', serif; font-size: .9rem; color: var(--purple); margin-bottom: 6px; }
+.sort-bin-items { font-size: .78rem; color: var(--muted); }
+
+/* PROPERTY TAGS INLINE */
+.prop-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+/* REVEAL */
+.reveal-chip { font-size: .9rem; font-weight: 600; padding: 8px 20px; border-radius: 50px; background: var(--surface2); border: 1.5px solid var(--border); color: var(--muted); cursor: pointer; transition: all .2s; display: inline-block; margin: 5px; }
+.reveal-chip.on { background: var(--purple-light); border-color: var(--purple); color: var(--purple); }
+
+/* DIAGONAL DEMO */
+.diag-wrap { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin: 16px 0; }
+.diag-item { text-align: center; }
+.diag-label { font-size: .82rem; font-weight: 600; color: var(--muted); margin-top: 6px; }
+
+@media(max-width:600px){
+  header { padding: 14px 16px; } header h1 { font-size: 1.2rem; }
+  .tabs { padding: 10px 16px 0; } main { padding: 16px; }
+  .card { padding: 16px; }
+  .detective-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <span style="font-size:2rem">🔷</span>
+  <div>
+    <h1>Classifying 2D Shapes</h1>
+    <p>Focus on Quadrilaterals — properties, types &amp; the family tree</p>
+  </div>
+  <span class="h-badge">Session 1 · 50 min</span>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="warmup">☀️ Warm-up · 5m</button>
+  <button class="tab-btn" data-tab="intro">💡 Introduction · 10m</button>
+  <button class="tab-btn" data-tab="detective">🔍 Detective · 15m</button>
+  <button class="tab-btn" data-tab="sort">🗂️ Sort &amp; Classify · 15m</button>
+  <button class="tab-btn" data-tab="wrapup">🏆 Wrap-up · 5m</button>
+</nav>
+
+<main>
+
+<!-- ══════════ WARM-UP ══════════ -->
+<section id="warmup" class="section active">
+  <div class="card">
+    <div class="card-title" style="color:var(--purple)">☀️ Shape Flash — Tap to Reveal!</div>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:16px">Tap each card to reveal the shape name and number of sides. Name it <em>before</em> you flip!</p>
+    <div class="flash-grid">
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-card-front">
+          <svg width="70" height="70" viewBox="0 0 70 70"><polygon points="35,5 65,60 5,60" fill="#ede9fe" stroke="#6d28d9" stroke-width="2.5"/></svg>
+          <span style="font-size:.78rem;color:var(--muted);font-weight:600">Tap to reveal</span>
+        </div>
+        <div class="flash-card-back">Triangle<br><span style="font-size:.82rem;color:var(--muted)">3 sides</span></div>
+      </div>
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-card-front">
+          <svg width="70" height="70" viewBox="0 0 70 70"><circle cx="35" cy="35" r="28" fill="#ede9fe" stroke="#6d28d9" stroke-width="2.5"/></svg>
+          <span style="font-size:.78rem;color:var(--muted);font-weight:600">Tap to reveal</span>
+        </div>
+        <div class="flash-card-back">Circle<br><span style="font-size:.82rem;color:var(--muted)">0 sides (curved)</span></div>
+      </div>
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-card-front">
+          <svg width="70" height="70" viewBox="0 0 70 70"><rect x="10" y="10" width="50" height="50" fill="#ede9fe" stroke="#6d28d9" stroke-width="2.5"/></svg>
+          <span style="font-size:.78rem;color:var(--muted);font-weight:600">Tap to reveal</span>
+        </div>
+        <div class="flash-card-back">Square<br><span style="font-size:.82rem;color:var(--muted)">4 equal sides</span></div>
+      </div>
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-card-front">
+          <svg width="70" height="70" viewBox="0 0 70 70"><rect x="5" y="20" width="60" height="30" fill="#ede9fe" stroke="#6d28d9" stroke-width="2.5"/></svg>
+          <span style="font-size:.78rem;color:var(--muted);font-weight:600">Tap to reveal</span>
+        </div>
+        <div class="flash-card-back">Rectangle<br><span style="font-size:.82rem;color:var(--muted)">4 sides, 2 pairs equal</span></div>
+      </div>
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-card-front">
+          <svg width="70" height="70" viewBox="0 0 70 70"><polygon points="35,5 65,35 35,65 5,35" fill="#ede9fe" stroke="#6d28d9" stroke-width="2.5"/></svg>
+          <span style="font-size:.78rem;color:var(--muted);font-weight:600">Tap to reveal</span>
+        </div>
+        <div class="flash-card-back">Rhombus<br><span style="font-size:.82rem;color:var(--muted)">4 equal sides</span></div>
+      </div>
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-card-front">
+          <svg width="70" height="70" viewBox="0 0 70 70"><polygon points="10,10 60,10 70,60 0,60" fill="#ede9fe" stroke="#6d28d9" stroke-width="2.5"/></svg>
+          <span style="font-size:.78rem;color:var(--muted);font-weight:600">Tap to reveal</span>
+        </div>
+        <div class="flash-card-back">Trapezoid<br><span style="font-size:.82rem;color:var(--muted)">4 sides, 1 pair parallel</span></div>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--surface2);border-color:var(--border);box-shadow:none;margin-top:4px">
+      <div style="font-weight:700;font-size:.95rem;margin-bottom:10px;color:var(--purple)">Quick Check — How many sides does a quadrilateral have?</div>
+      <div class="q-opts">
+        <button class="q-opt" onclick="ansQ('wq1','3',false,this)">3</button>
+        <button class="q-opt" onclick="ansQ('wq1','4',true,this)">4</button>
+        <button class="q-opt" onclick="ansQ('wq1','5',false,this)">5</button>
+        <button class="q-opt" onclick="ansQ('wq1','6',false,this)">6</button>
+      </div>
+      <div class="feedback" id="wq1-fb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ INTRO ══════════ -->
+<section id="intro" class="section">
+  <div class="card">
+    <div class="card-title" style="color:var(--purple)">💡 The Four-Sided Family</div>
+    <p style="line-height:1.7;margin-bottom:12px">A <strong>quadrilateral</strong> is any closed polygon with exactly <strong>4 sides</strong> and <strong>4 angles</strong>. <em>"Quad"</em> means four, <em>"lateral"</em> means side.</p>
+    <div class="tip"><span class="tip-icon">🔑</span><span>Every quadrilateral also has <strong>4 vertices</strong> (corners) and <strong>2 diagonals</strong> (lines connecting opposite corners). The interior angles always add up to <strong>360°</strong>.</span></div>
+
+    <!-- Key properties -->
+    <div class="card-title" style="font-size:1rem;margin-top:6px;color:var(--purple)">🏷️ Key Properties to Look For</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px">
+      <div style="background:var(--indigo-light);border:1.5px solid var(--indigo);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:1.5rem;margin-bottom:4px">⟷</div>
+        <div style="font-weight:700;font-size:.88rem;color:var(--indigo)">Parallel Sides</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:3px">Lines that never meet, always the same distance apart</div>
+      </div>
+      <div style="background:var(--amber-light);border:1.5px solid var(--amber);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:1.5rem;margin-bottom:4px">≡</div>
+        <div style="font-weight:700;font-size:.88rem;color:var(--amber)">Equal Sides</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:3px">Sides that are the same length (shown with tick marks)</div>
+      </div>
+      <div style="background:var(--teal-light);border:1.5px solid var(--teal);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:1.5rem;margin-bottom:4px">⊾</div>
+        <div style="font-weight:700;font-size:.88rem;color:var(--teal)">Right Angles</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:3px">Exactly 90° — shown with a small square in the corner</div>
+      </div>
+    </div>
+
+    <!-- Diagonals -->
+    <div class="card-title" style="font-size:1rem;margin-top:6px;color:var(--purple)">✕ Diagonals in Quadrilaterals</div>
+    <p style="font-size:.9rem;color:var(--muted);margin-bottom:12px">A <strong>diagonal</strong> connects two non-adjacent (opposite) vertices. All quadrilaterals have exactly <strong>2 diagonals</strong>.</p>
+    <div class="diag-wrap">
+      <div class="diag-item">
+        <svg width="110" height="100" viewBox="0 0 110 100">
+          <rect x="10" y="10" width="90" height="80" fill="var(--purple-light)" stroke="var(--purple)" stroke-width="2.5"/>
+          <line x1="10" y1="10" x2="100" y2="90" stroke="var(--pink)" stroke-width="2" stroke-dasharray="5,3"/>
+          <line x1="100" y1="10" x2="10" y2="90" stroke="var(--pink)" stroke-width="2" stroke-dasharray="5,3"/>
+          <circle cx="10" cy="10" r="4" fill="var(--purple)"/>
+          <circle cx="100" cy="10" r="4" fill="var(--purple)"/>
+          <circle cx="100" cy="90" r="4" fill="var(--purple)"/>
+          <circle cx="10" cy="90" r="4" fill="var(--purple)"/>
+        </svg>
+        <div class="diag-label">Rectangle — 2 diagonals</div>
+      </div>
+      <div class="diag-item">
+        <svg width="110" height="100" viewBox="0 0 110 100">
+          <polygon points="55,8 100,50 55,92 10,50" fill="var(--indigo-light)" stroke="var(--indigo)" stroke-width="2.5"/>
+          <line x1="55" y1="8" x2="55" y2="92" stroke="var(--pink)" stroke-width="2" stroke-dasharray="5,3"/>
+          <line x1="10" y1="50" x2="100" y2="50" stroke="var(--pink)" stroke-width="2" stroke-dasharray="5,3"/>
+          <circle cx="55" cy="8" r="4" fill="var(--indigo)"/>
+          <circle cx="100" cy="50" r="4" fill="var(--indigo)"/>
+          <circle cx="55" cy="92" r="4" fill="var(--indigo)"/>
+          <circle cx="10" cy="50" r="4" fill="var(--indigo)"/>
+        </svg>
+        <div class="diag-label">Rhombus — 2 diagonals</div>
+      </div>
+      <div class="diag-item">
+        <svg width="110" height="100" viewBox="0 0 110 100">
+          <polygon points="20,15 90,15 100,85 10,85" fill="var(--teal-light)" stroke="var(--teal)" stroke-width="2.5"/>
+          <line x1="20" y1="15" x2="100" y2="85" stroke="var(--pink)" stroke-width="2" stroke-dasharray="5,3"/>
+          <line x1="90" y1="15" x2="10" y2="85" stroke="var(--pink)" stroke-width="2" stroke-dasharray="5,3"/>
+          <circle cx="20" cy="15" r="4" fill="var(--teal)"/>
+          <circle cx="90" cy="15" r="4" fill="var(--teal)"/>
+          <circle cx="100" cy="85" r="4" fill="var(--teal)"/>
+          <circle cx="10" cy="85" r="4" fill="var(--teal)"/>
+        </svg>
+        <div class="diag-label">Trapezoid — 2 diagonals</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ DETECTIVE ══════════ -->
+<section id="detective" class="section">
+  <div class="card">
+    <div class="card-title" style="color:var(--purple)">🔍 Geometry Detective — Tap each shape to investigate!</div>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:14px">Tap a shape card to expand it and reveal all its properties. Can you spot the patterns?</p>
+
+    <div class="detective-grid">
+
+      <!-- SQUARE -->
+      <div class="det-card" onclick="toggleDet(this)">
+        <div class="det-card-header">
+          <svg width="50" height="50" viewBox="0 0 50 50"><rect x="5" y="5" width="40" height="40" fill="var(--purple-light)" stroke="var(--purple)" stroke-width="2.5"/>
+            <!-- tick marks -->
+            <line x1="21" y1="5" x2="25" y2="9" stroke="var(--amber)" stroke-width="1.5"/><line x1="25" y1="5" x2="29" y2="9" stroke="var(--amber)" stroke-width="1.5"/>
+            <line x1="45" y1="21" x2="41" y2="25" stroke="var(--amber)" stroke-width="1.5"/><line x1="45" y1="25" x2="41" y2="29" stroke="var(--amber)" stroke-width="1.5"/>
+            <line x1="21" y1="45" x2="25" y2="41" stroke="var(--amber)" stroke-width="1.5"/><line x1="25" y1="45" x2="29" y2="41" stroke="var(--amber)" stroke-width="1.5"/>
+            <line x1="5" y1="21" x2="9" y2="25" stroke="var(--amber)" stroke-width="1.5"/><line x1="5" y1="25" x2="9" y2="29" stroke="var(--amber)" stroke-width="1.5"/>
+            <!-- right angle marks -->
+            <rect x="5" y="5" width="8" height="8" fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+            <rect x="37" y="5" width="8" height="8" fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+            <rect x="37" y="37" width="8" height="8" fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+            <rect x="5" y="37" width="8" height="8" fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+          </svg>
+          <div>
+            <div class="det-card-name">Square</div>
+            <div style="font-size:.78rem;color:var(--muted)">The most special quad!</div>
+          </div>
+          <span class="expand-hint">Tap to expand ▼</span>
+        </div>
+        <div class="det-card-body">
+          <ul class="prop-list">
+            <li>All <strong>4 sides are equal</strong> in length</li>
+            <li>All <strong>4 angles are 90°</strong> (right angles)</li>
+            <li>Both pairs of opposite sides are <strong>parallel</strong></li>
+            <li>Diagonals bisect each other at <strong>90°</strong></li>
+          </ul>
+          <div class="prop-tags">
+            <span class="prop-tag tag-equal">4 equal sides</span>
+            <span class="prop-tag tag-right">4 right angles</span>
+            <span class="prop-tag tag-para">2 pairs parallel</span>
+            <span class="prop-tag tag-also">Also a: rectangle, rhombus, parallelogram</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECTANGLE -->
+      <div class="det-card" onclick="toggleDet(this)">
+        <div class="det-card-header">
+          <svg width="60" height="45" viewBox="0 0 60 45"><rect x="4" y="4" width="52" height="37" fill="var(--indigo-light)" stroke="var(--indigo)" stroke-width="2.5"/>
+            <line x1="26" y1="4" x2="30" y2="8" stroke="var(--amber)" stroke-width="1.5"/><line x1="30" y1="4" x2="34" y2="8" stroke="var(--amber)" stroke-width="1.5"/>
+            <line x1="26" y1="41" x2="30" y2="37" stroke="var(--amber)" stroke-width="1.5"/><line x1="30" y1="41" x2="34" y2="37" stroke="var(--amber)" stroke-width="1.5"/>
+            <line x1="4" y1="19" x2="8" y2="22" stroke="var(--pink)" stroke-width="1.5"/><line x1="56" y1="19" x2="52" y2="22" stroke="var(--pink)" stroke-width="1.5"/>
+            <rect x="4" y="4" width="8" height="8" fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+            <rect x="48" y="4" width="8" height="8" fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+            <rect x="48" y="33" width="8" height="8" fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+            <rect x="4" y="33" width="8" height="8" fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+          </svg>
+          <div>
+            <div class="det-card-name">Rectangle</div>
+            <div style="font-size:.78rem;color:var(--muted)">Right angles, 2 pairs equal</div>
+          </div>
+          <span class="expand-hint">Tap to expand ▼</span>
+        </div>
+        <div class="det-card-body">
+          <ul class="prop-list">
+            <li>Opposite sides are <strong>equal</strong> in length</li>
+            <li>All <strong>4 angles are 90°</strong> (right angles)</li>
+            <li>Both pairs of opposite sides are <strong>parallel</strong></li>
+            <li>Diagonals are equal in length and bisect each other</li>
+          </ul>
+          <div class="prop-tags">
+            <span class="prop-tag tag-equal">2 pairs equal sides</span>
+            <span class="prop-tag tag-right">4 right angles</span>
+            <span class="prop-tag tag-para">2 pairs parallel</span>
+            <span class="prop-tag tag-also">Also a: parallelogram</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RHOMBUS -->
+      <div class="det-card" onclick="toggleDet(this)">
+        <div class="det-card-header">
+          <svg width="55" height="55" viewBox="0 0 55 55"><polygon points="27,5 50,27 27,50 4,27" fill="var(--amber-light)" stroke="var(--amber)" stroke-width="2.5"/>
+            <line x1="14" y1="13" x2="18" y2="17" stroke="var(--amber)" stroke-width="1.5"/><line x1="40" y1="39" x2="36" y2="35" stroke="var(--amber)" stroke-width="1.5"/>
+            <line x1="40" y1="13" x2="36" y2="17" stroke="var(--amber)" stroke-width="1.5"/><line x1="14" y1="39" x2="18" y2="35" stroke="var(--amber)" stroke-width="1.5"/>
+          </svg>
+          <div>
+            <div class="det-card-name">Rhombus</div>
+            <div style="font-size:.78rem;color:var(--muted)">The "tilted square"</div>
+          </div>
+          <span class="expand-hint">Tap to expand ▼</span>
+        </div>
+        <div class="det-card-body">
+          <ul class="prop-list">
+            <li>All <strong>4 sides are equal</strong> in length</li>
+            <li>Opposite angles are <strong>equal</strong> (but NOT necessarily 90°)</li>
+            <li>Both pairs of opposite sides are <strong>parallel</strong></li>
+            <li>Diagonals bisect each other at <strong>90°</strong> but are different lengths</li>
+          </ul>
+          <div class="prop-tags">
+            <span class="prop-tag tag-equal">4 equal sides</span>
+            <span class="prop-tag tag-para">2 pairs parallel</span>
+            <span class="prop-tag tag-also">Also a: parallelogram</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARALLELOGRAM -->
+      <div class="det-card" onclick="toggleDet(this)">
+        <div class="det-card-header">
+          <svg width="65" height="48" viewBox="0 0 65 48"><polygon points="14,4 60,4 50,44 4,44" fill="var(--teal-light)" stroke="var(--teal)" stroke-width="2.5"/>
+            <line x1="32" y1="4" x2="36" y2="8" stroke="var(--amber)" stroke-width="1.5"/><line x1="26" y1="44" x2="30" y2="40" stroke="var(--amber)" stroke-width="1.5"/>
+            <line x1="7" y1="24" x2="11" y2="24" stroke="var(--pink)" stroke-width="2"/>
+            <line x1="53" y1="24" x2="57" y2="24" stroke="var(--pink)" stroke-width="2"/>
+          </svg>
+          <div>
+            <div class="det-card-name">Parallelogram</div>
+            <div style="font-size:.78rem;color:var(--muted)">Opposite sides parallel</div>
+          </div>
+          <span class="expand-hint">Tap to expand ▼</span>
+        </div>
+        <div class="det-card-body">
+          <ul class="prop-list">
+            <li>Opposite sides are <strong>parallel</strong> and <strong>equal</strong></li>
+            <li>Opposite angles are <strong>equal</strong></li>
+            <li>Adjacent angles add up to <strong>180°</strong></li>
+            <li>Diagonals bisect each other (but are not equal)</li>
+          </ul>
+          <div class="prop-tags">
+            <span class="prop-tag tag-equal">2 pairs equal sides</span>
+            <span class="prop-tag tag-para">2 pairs parallel</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRAPEZOID -->
+      <div class="det-card" onclick="toggleDet(this)">
+        <div class="det-card-header">
+          <svg width="65" height="50" viewBox="0 0 65 50"><polygon points="15,6 50,6 62,44 3,44" fill="var(--pink-light)" stroke="var(--pink)" stroke-width="2.5"/>
+            <line x1="25" y1="6" x2="30" y2="6" stroke="var(--indigo)" stroke-width="3" stroke-linecap="round"/>
+            <line x1="25" y1="44" x2="30" y2="44" stroke="var(--indigo)" stroke-width="3" stroke-linecap="round"/>
+            <line x1="35" y1="6" x2="40" y2="6" stroke="var(--indigo)" stroke-width="3" stroke-linecap="round"/>
+            <line x1="35" y1="44" x2="40" y2="44" stroke="var(--indigo)" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <div>
+            <div class="det-card-name">Trapezoid / Trapezium</div>
+            <div style="font-size:.78rem;color:var(--muted)">At least 1 pair parallel</div>
+          </div>
+          <span class="expand-hint">Tap to expand ▼</span>
+        </div>
+        <div class="det-card-body">
+          <ul class="prop-list">
+            <li>Exactly <strong>one pair of parallel sides</strong> (called the "bases")</li>
+            <li>The other two sides are called "legs" — they may be equal (isosceles trapezoid) or not</li>
+            <li>Co-interior angles between parallel sides add to <strong>180°</strong></li>
+          </ul>
+          <div class="prop-tags">
+            <span class="prop-tag tag-para">1 pair parallel</span>
+          </div>
+          <div class="tip" style="margin-top:10px;font-size:.82rem"><span class="tip-icon">🌏</span><span>In Australia we usually say <strong>trapezium</strong>. In North America they say <strong>trapezoid</strong>. Both mean the same shape!</span></div>
+        </div>
+      </div>
+
+      <!-- KITE -->
+      <div class="det-card" onclick="toggleDet(this)">
+        <div class="det-card-header">
+          <svg width="48" height="60" viewBox="0 0 48 60"><polygon points="24,3 44,26 24,57 4,26" fill="var(--purple-light)" stroke="var(--purple)" stroke-width="2.5"/>
+            <line x1="10" y1="12" x2="14" y2="15" stroke="var(--amber)" stroke-width="1.5"/><line x1="36" y1="12" x2="32" y2="15" stroke="var(--amber)" stroke-width="1.5"/>
+            <line x1="10" y1="40" x2="14" y2="37" stroke="var(--pink)" stroke-width="1.5"/><line x1="36" y1="40" x2="32" y2="37" stroke="var(--pink)" stroke-width="1.5"/>
+          </svg>
+          <div>
+            <div class="det-card-name">Kite</div>
+            <div style="font-size:.78rem;color:var(--muted)">2 pairs of adjacent equal sides</div>
+          </div>
+          <span class="expand-hint">Tap to expand ▼</span>
+        </div>
+        <div class="det-card-body">
+          <ul class="prop-list">
+            <li>Two pairs of adjacent sides are <strong>equal</strong></li>
+            <li>One pair of opposite angles are <strong>equal</strong></li>
+            <li>Diagonals are <strong>perpendicular</strong> (cross at 90°)</li>
+            <li>One diagonal bisects the other</li>
+          </ul>
+          <div class="prop-tags">
+            <span class="prop-tag tag-equal">2 pairs adjacent equal</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Family tree -->
+    <div class="card" style="background:var(--surface2);border-color:var(--border);box-shadow:none">
+      <div class="card-title" style="font-size:1rem;color:var(--purple)">🌳 The Quadrilateral Family Tree</div>
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:10px">A shape lower in the tree has ALL the properties of shapes above it.</p>
+      <div class="hier-wrap">
+        <svg width="580" height="220" viewBox="0 0 580 220" xmlns="http://www.w3.org/2000/svg" style="min-width:520px">
+          <!-- Lines -->
+          <line x1="290" y1="42" x2="145" y2="98" stroke="var(--border)" stroke-width="2"/>
+          <line x1="290" y1="42" x2="435" y2="98" stroke="var(--border)" stroke-width="2"/>
+          <line x1="145" y1="118" x2="90" y2="168" stroke="var(--border)" stroke-width="2"/>
+          <line x1="145" y1="118" x2="200" y2="168" stroke="var(--border)" stroke-width="2"/>
+          <line x1="200" y1="168" x2="145" y2="168" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
+          <!-- Boxes -->
+          <rect x="210" y="12" width="160" height="30" rx="8" fill="var(--purple-light)" stroke="var(--purple)" stroke-width="1.5"/>
+          <text x="290" y="31" text-anchor="middle" fill="var(--purple)" font-size="13" font-weight="700">Quadrilateral</text>
+          <rect x="65" y="98" width="160" height="28" rx="8" fill="var(--indigo-light)" stroke="var(--indigo)" stroke-width="1.5"/>
+          <text x="145" y="116" text-anchor="middle" fill="var(--indigo)" font-size="12" font-weight="700">Parallelogram</text>
+          <rect x="355" y="98" width="160" height="28" rx="8" fill="var(--pink-light)" stroke="var(--pink)" stroke-width="1.5"/>
+          <text x="435" y="116" text-anchor="middle" fill="var(--pink)" font-size="12" font-weight="700">Trapezoid</text>
+          <rect x="10" y="162" width="110" height="28" rx="8" fill="var(--amber-light)" stroke="var(--amber)" stroke-width="1.5"/>
+          <text x="65" y="180" text-anchor="middle" fill="var(--amber)" font-size="12" font-weight="700">Rhombus</text>
+          <rect x="130" y="162" width="130" height="28" rx="8" fill="var(--teal-light)" stroke="var(--teal)" stroke-width="1.5"/>
+          <text x="195" y="180" text-anchor="middle" fill="var(--teal)" font-size="12" font-weight="700">Rectangle</text>
+          <!-- Square at bottom centre -->
+          <line x1="65" y1="190" x2="120" y2="210" stroke="var(--border)" stroke-width="2"/>
+          <line x1="195" y1="190" x2="120" y2="210" stroke="var(--border)" stroke-width="2"/>
+          <rect x="60" y="200" width="120" height="28" rx="8" fill="var(--purple)" stroke="var(--purple)" stroke-width="1.5"/>
+          <text x="120" y="219" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Square ★</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SORT & CLASSIFY ══════════ -->
+<section id="sort" class="section">
+  <div class="card">
+    <div class="card-title" style="color:var(--purple)">🗂️ Quadrilateral Sort</div>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:14px">For each shape below, identify its <strong>most specific name</strong> and key properties.</p>
+
+    <!-- Q1 -->
+    <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:12px">
+      <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+        <svg width="90" height="90" viewBox="0 0 90 90">
+          <rect x="10" y="10" width="70" height="70" fill="var(--purple-light)" stroke="var(--purple)" stroke-width="2.5"/>
+          <rect x="10" y="10" width="10" height="10" fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+          <rect x="70" y="10" width="10" height="10" fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+          <rect x="70" y="70" width="10" height="10" fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+          <rect x="10" y="70" width="10" height="10" fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+          <line x1="41" y1="10" x2="45" y2="14" stroke="var(--amber)" stroke-width="1.5"/><line x1="45" y1="10" x2="49" y2="14" stroke="var(--amber)" stroke-width="1.5"/>
+          <line x1="41" y1="80" x2="45" y2="76" stroke="var(--amber)" stroke-width="1.5"/><line x1="45" y1="80" x2="49" y2="76" stroke="var(--amber)" stroke-width="1.5"/>
+          <line x1="10" y1="41" x2="14" y2="45" stroke="var(--amber)" stroke-width="1.5"/><line x1="10" y1="45" x2="14" y2="49" stroke="var(--amber)" stroke-width="1.5"/>
+          <line x1="80" y1="41" x2="76" y2="45" stroke="var(--amber)" stroke-width="1.5"/><line x1="80" y1="45" x2="76" y2="49" stroke="var(--amber)" stroke-width="1.5"/>
+        </svg>
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:700;margin-bottom:8px">What is this shape? Choose the <em>most specific</em> name.</div>
+          <div class="q-opts">
+            <button class="q-opt" onclick="ansQ('sq1','Quadrilateral',false,this)">Quadrilateral</button>
+            <button class="q-opt" onclick="ansQ('sq1','Rectangle',false,this)">Rectangle</button>
+            <button class="q-opt" onclick="ansQ('sq1','Square',true,this)">Square ✓</button>
+            <button class="q-opt" onclick="ansQ('sq1','Rhombus',false,this)">Rhombus</button>
+          </div>
+          <div class="feedback" id="sq1-fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:12px">
+      <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+        <svg width="110" height="70" viewBox="0 0 110 70">
+          <polygon points="18,8 92,8 100,62 10,62" fill="var(--teal-light)" stroke="var(--teal)" stroke-width="2.5"/>
+          <line x1="45" y1="8" x2="50" y2="8" stroke="var(--indigo)" stroke-width="3" stroke-linecap="round"/>
+          <line x1="55" y1="8" x2="60" y2="8" stroke="var(--indigo)" stroke-width="3" stroke-linecap="round"/>
+          <line x1="45" y1="62" x2="50" y2="62" stroke="var(--indigo)" stroke-width="3" stroke-linecap="round"/>
+          <line x1="55" y1="62" x2="60" y2="62" stroke="var(--indigo)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:700;margin-bottom:8px">The arrow marks show parallel sides. What is the most specific name?</div>
+          <div class="q-opts">
+            <button class="q-opt" onclick="ansQ('sq2','Parallelogram',false,this)">Parallelogram</button>
+            <button class="q-opt" onclick="ansQ('sq2','Trapezoid',true,this)">Trapezoid ✓</button>
+            <button class="q-opt" onclick="ansQ('sq2','Rectangle',false,this)">Rectangle</button>
+            <button class="q-opt" onclick="ansQ('sq2','Rhombus',false,this)">Rhombus</button>
+          </div>
+          <div class="feedback" id="sq2-fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:12px">
+      <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+        <svg width="90" height="70" viewBox="0 0 90 70">
+          <polygon points="20,8 70,8 80,62 10,62" fill="var(--indigo-light)" stroke="var(--indigo)" stroke-width="2.5"/>
+          <line x1="40" y1="8" x2="44" y2="12" stroke="var(--amber)" stroke-width="1.5"/><line x1="50" y1="8" x2="46" y2="12" stroke="var(--amber)" stroke-width="1.5"/>
+          <line x1="40" y1="62" x2="44" y2="58" stroke="var(--amber)" stroke-width="1.5"/><line x1="50" y1="62" x2="46" y2="58" stroke="var(--amber)" stroke-width="1.5"/>
+          <line x1="13" y1="32" x2="17" y2="36" stroke="var(--pink)" stroke-width="1.5"/>
+          <line x1="73" y1="32" x2="77" y2="36" stroke="var(--pink)" stroke-width="1.5"/>
+        </svg>
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:700;margin-bottom:8px">Opposite sides are parallel and equal. What is it?</div>
+          <div class="q-opts">
+            <button class="q-opt" onclick="ansQ('sq3','Trapezoid',false,this)">Trapezoid</button>
+            <button class="q-opt" onclick="ansQ('sq3','Rectangle',false,this)">Rectangle</button>
+            <button class="q-opt" onclick="ansQ('sq3','Parallelogram',true,this)">Parallelogram ✓</button>
+            <button class="q-opt" onclick="ansQ('sq3','Kite',false,this)">Kite</button>
+          </div>
+          <div class="feedback" id="sq3-fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenge -->
+    <div style="background:var(--amber-light);border:1.5px solid var(--amber);border-radius:14px;padding:16px 20px;margin-top:6px">
+      <div style="font-family:'Fraunces',serif;font-size:1rem;color:var(--amber);margin-bottom:8px">🌟 Challenge Question</div>
+      <div style="font-weight:600;font-size:.95rem;margin-bottom:10px">"Can a shape be a parallelogram but NOT a rectangle? Which shape is an example?"</div>
+      <div class="q-opts">
+        <button class="q-opt" onclick="ansQ('chq','No — all parallelograms are rectangles',false,this)">No — all parallelograms are rectangles</button>
+        <button class="q-opt" onclick="ansQ('chq','Yes — a rhombus or regular parallelogram',true,this)">Yes — a rhombus or non-rectangular parallelogram ✓</button>
+      </div>
+      <div class="feedback" id="chq-fb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ WRAP-UP ══════════ -->
+<section id="wrapup" class="section">
+  <div class="card">
+    <div class="card-title" style="color:var(--purple)">🏆 Property Power</div>
+    <div style="background:var(--purple-light);border:1.5px solid var(--purple);border-radius:14px;padding:18px 20px;margin-bottom:16px;text-align:center">
+      <div style="font-family:'Fraunces',serif;font-size:1.1rem;color:var(--indigo);line-height:1.5">"Why can a square be called both a <em>rectangle</em> and a <em>rhombus</em>?"</div>
+    </div>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:12px">Tap each answer to reveal it!</p>
+    <div>
+      <span class="reveal-chip" onclick="this.classList.toggle('on')">It has all 4 right angles → qualifies as a rectangle</span>
+      <span class="reveal-chip" onclick="this.classList.toggle('on')">It has all 4 equal sides → qualifies as a rhombus</span>
+      <span class="reveal-chip" onclick="this.classList.toggle('on')">A shape can belong to multiple categories</span>
+      <span class="reveal-chip" onclick="this.classList.toggle('on')">More specific = more properties ✓</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="color:var(--purple)">📌 Quick Reference — Quadrilateral Properties</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+        <thead>
+          <tr style="background:var(--purple);color:#fff">
+            <th style="padding:10px 12px;text-align:left;border-radius:8px 0 0 0">Shape</th>
+            <th style="padding:10px 8px;text-align:center">Equal sides</th>
+            <th style="padding:10px 8px;text-align:center">Parallel sides</th>
+            <th style="padding:10px 8px;text-align:center">Right angles</th>
+            <th style="padding:10px 12px;text-align:center;border-radius:0 8px 0 0">Diagonals</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:var(--surface2)"><td style="padding:8px 12px;font-weight:700">Square</td><td style="text-align:center">All 4</td><td style="text-align:center">2 pairs</td><td style="text-align:center">All 4</td><td style="text-align:center">Equal, ⊥</td></tr>
+          <tr><td style="padding:8px 12px;font-weight:700">Rectangle</td><td style="text-align:center">2 pairs</td><td style="text-align:center">2 pairs</td><td style="text-align:center">All 4</td><td style="text-align:center">Equal</td></tr>
+          <tr style="background:var(--surface2)"><td style="padding:8px 12px;font-weight:700">Rhombus</td><td style="text-align:center">All 4</td><td style="text-align:center">2 pairs</td><td style="text-align:center">None*</td><td style="text-align:center">⊥ bisect</td></tr>
+          <tr><td style="padding:8px 12px;font-weight:700">Parallelogram</td><td style="text-align:center">2 pairs</td><td style="text-align:center">2 pairs</td><td style="text-align:center">None*</td><td style="text-align:center">Bisect each</td></tr>
+          <tr style="background:var(--surface2)"><td style="padding:8px 12px;font-weight:700">Trapezoid</td><td style="text-align:center">Varies</td><td style="text-align:center">1 pair</td><td style="text-align:center">Varies</td><td style="text-align:center">2</td></tr>
+          <tr><td style="padding:8px 12px;font-weight:700">Kite</td><td style="text-align:center">2 adj. pairs</td><td style="text-align:center">None</td><td style="text-align:center">Varies</td><td style="text-align:center">⊥</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:.75rem;color:var(--muted);margin-top:6px">* Unless it's also a square/rectangle. &nbsp;⊥ = perpendicular (90°)</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* TABS */
+document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.getElementById(b.dataset.tab).classList.add('active');
+}));
+
+/* GENERIC QUIZ */
+const qDone = {};
+function ansQ(id, val, correct, btn) {
+  if (qDone[id]) return;
+  qDone[id] = true;
+  const fb = document.getElementById(id + '-fb');
+  btn.closest('.q-opts').querySelectorAll('.q-opt').forEach(b => b.classList.add('wrong'));
+  btn.classList.remove('wrong');
+  if (correct) {
+    btn.classList.add('correct'); fb.className = 'feedback good';
+    const msgs = {
+      'wq1': '🎉 Correct! Quad = 4, lateral = sides. 4 sides!',
+      'sq1': '🎉 Square! All 4 sides equal AND all 4 right angles — most specific name.',
+      'sq2': '🎉 Trapezoid — exactly one pair of parallel sides (the arrows show them).',
+      'sq3': '🎉 Parallelogram — 2 pairs of parallel, equal opposite sides.',
+      'chq': '🎉 Yes! A rhombus has 4 equal sides but no right angles — it\'s a parallelogram, not a rectangle.'
+    };
+    fb.textContent = msgs[id] || '🎉 Correct!';
+  } else {
+    btn.classList.add('wrong'); fb.className = 'feedback bad';
+    // highlight correct
+    btn.closest('.q-opts').querySelectorAll('.q-opt').forEach(b => { if (b.dataset && b._correct) b.classList.add('showans'); });
+    const hints = {
+      'wq1': '❌ Count the sides: quad = 4.',
+      'sq1': '❌ All 4 sides are equal AND all angles 90° — that makes it a Square, the most specific name.',
+      'sq2': '❌ Only one pair of sides is parallel (the arrows) — that\'s a Trapezoid.',
+      'sq3': '❌ Both pairs of opposite sides are parallel and equal — that\'s a Parallelogram.',
+      'chq': '❌ A rhombus has all equal sides but angles aren\'t 90° — so it\'s a parallelogram but not a rectangle!'
+    };
+    fb.textContent = hints[id] || '❌ Try again!';
+  }
+}
+
+/* DETECTIVE EXPAND */
+function toggleDet(card) {
+  const wasExpanded = card.classList.contains('expanded');
+  document.querySelectorAll('.det-card').forEach(c => c.classList.remove('expanded'));
+  if (!wasExpanded) card.classList.add('expanded');
+}
+</script>
+</body>
+</html>
